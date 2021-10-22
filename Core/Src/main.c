@@ -19,7 +19,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "i2c.h"
 #include "tim.h"
 #include "gpio.h"
@@ -29,6 +28,8 @@
 #include "stdio.h"
 #include "ssd1306.h"
 #include "ssd1306_tests.h"
+
+#include "ADCHandler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,60 +91,43 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC_Init();
+	
+  initADC();
   MX_I2C1_Init();
   MX_TIM1_Init();
   MX_TIM14_Init();
   MX_TIM16_Init();
   MX_TIM17_Init();
+  
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+	startADC();
+	
 	ssd1306_Init();
 	ssd1306_Fill(Black);
 	ssd1306_SetCursor(32, 1);
   ssd1306_WriteString("Ali", &Font_16x26, White);
 	ssd1306_UpdateScreen();
+	ssd1306_Fill(Black);
+	ssd1306_UpdateScreen();
 	HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
-	__HAL_TIM_SetCompare(&htim14,TIM_CHANNEL_1, 2000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
-
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-//		HAL_GPIO_WritePin(TestLED_GPIO_Port, TestLED_Pin, GPIO_PIN_SET);
-//		HAL_Delay(100);
-//		HAL_GPIO_WritePin(TestLED_GPIO_Port, TestLED_Pin, GPIO_PIN_RESET);
-//		HAL_Delay(100);
-//		uint32_t adc = 0;
-		for(int i = 0; i <7; i++)
-    {
-			HAL_ADC_Start(&hadc);
-			HAL_ADC_PollForConversion(&hadc,500);
-			if(i == 2) {
-				
-				uint16_t adc = HAL_ADC_GetValue(&hadc);
-				if(adc > 4000) {
-					__HAL_TIM_SetCompare(&htim14,TIM_CHANNEL_1, 0);
-				}
-				else {
-					__HAL_TIM_SetCompare(&htim14,TIM_CHANNEL_1, 2000);
-				}
-				sprintf(lcdStringBuffer, "%6u", adc);
-				ssd1306_SetCursor(0, i * 15);
-				ssd1306_WriteString(lcdStringBuffer, &Font_7x10, White);
-				ssd1306_UpdateScreen();
-				
-			}
-			else {
-				ssd1306_Fill(Black);
-			}
-    }
-    
-		
-
+		float hv = getHighVoltage();
+		if (hv > 40) {
+			__HAL_TIM_SetCompare(&htim14, TIM_CHANNEL_1, 0);
+		}
+		else {
+			__HAL_TIM_SetCompare(&htim14, TIM_CHANNEL_1, 1000);
+		}
+		sprintf(lcdStringBuffer, "%f", hv);
+		ssd1306_SetCursor(0, 0);
+		ssd1306_WriteString(lcdStringBuffer, &Font_7x10, White);
+		ssd1306_UpdateScreen();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
