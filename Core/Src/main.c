@@ -69,6 +69,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	char lcdStringBuffer[50];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -102,6 +103,8 @@ int main(void)
 	ssd1306_SetCursor(32, 1);
   ssd1306_WriteString("Ali", &Font_16x26, White);
 	ssd1306_UpdateScreen();
+	HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
+	__HAL_TIM_SetCompare(&htim14,TIM_CHANNEL_1, 2000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,27 +113,34 @@ int main(void)
   while (1)
   {
 
-		HAL_GPIO_WritePin(TestLED_GPIO_Port, TestLED_Pin, GPIO_PIN_SET);
-		HAL_Delay(100);
-		HAL_GPIO_WritePin(TestLED_GPIO_Port, TestLED_Pin, GPIO_PIN_RESET);
-		HAL_Delay(100);
+//		HAL_GPIO_WritePin(TestLED_GPIO_Port, TestLED_Pin, GPIO_PIN_SET);
+//		HAL_Delay(100);
+//		HAL_GPIO_WritePin(TestLED_GPIO_Port, TestLED_Pin, GPIO_PIN_RESET);
+//		HAL_Delay(100);
 //		uint32_t adc = 0;
-//		for(int i = 0; i <7; i++)
-//    {
-//			HAL_ADC_Start(&hadc);
-//			HAL_ADC_PollForConversion(&hadc,500);
-//			if(i < 4) {
-//				
-//				adc = HAL_ADC_GetValue(&hadc);
-//				sprintf(lcdStringBuffer, "%6u", adc);
-//				ssd1306_SetCursor(0, i * 15);
-//				ssd1306_WriteString(lcdStringBuffer, &Font_7x10, White);
-//				ssd1306_UpdateScreen();
-//			}
-//			else {
-//				ssd1306_Fill(Black);
-//			}
-//    }
+		for(int i = 0; i <7; i++)
+    {
+			HAL_ADC_Start(&hadc);
+			HAL_ADC_PollForConversion(&hadc,500);
+			if(i == 2) {
+				
+				uint16_t adc = HAL_ADC_GetValue(&hadc);
+				if(adc > 4000) {
+					__HAL_TIM_SetCompare(&htim14,TIM_CHANNEL_1, 0);
+				}
+				else {
+					__HAL_TIM_SetCompare(&htim14,TIM_CHANNEL_1, 2000);
+				}
+				sprintf(lcdStringBuffer, "%6u", adc);
+				ssd1306_SetCursor(0, i * 15);
+				ssd1306_WriteString(lcdStringBuffer, &Font_7x10, White);
+				ssd1306_UpdateScreen();
+				
+			}
+			else {
+				ssd1306_Fill(Black);
+			}
+    }
     
 		
 
