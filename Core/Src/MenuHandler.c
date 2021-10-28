@@ -5,8 +5,6 @@
 #include "stdio.h"
 #include "ssd1306.h"
 #include "stdbool.h"
-///TODO: Delete later
-#include "ADCHandler.h"
 
 typedef enum MenuState { 
 	startTherapy = 0,
@@ -28,6 +26,7 @@ static char lcdStringBuffer[50];
 static MenuState highlightedIndex = startTherapy;
 static MenuState menuState = homeScreen;
 static WaveConfig waveConfig = {0.5, 0.5, 10};
+
 bool firstTimeEnter = true;
 
 ///Private Functions -> Declaration not available in header file
@@ -59,6 +58,18 @@ void handleConfiremedIndex(KeyType pressedKey) {
 	}
 }
 
+void handleValueChange(KeyType pressedKey, float* value, float min, float max, float step) {
+	if(pressedKey == right) {
+		(*value) += step;
+		if((*value) >= max)
+			(*value) = max;
+	}
+	else if(pressedKey == left) {
+		(*value) -= step;
+		if((*value) <= min)
+			(*value) = min;
+	}
+}
 float getCurrentIndexValue(uint8_t index) {
 	float value = 0.00;
 		switch (index)
@@ -86,6 +97,41 @@ void showStartTherapy(void) {
 	ssd1306_WriteString("Started", &Font_16x26, White);
 	turnOn(&waveConfig);
 	watchOverHighVoltage();
+}
+
+void showIntensitySelectionScreen(KeyType pressedKey) {
+	static const Intensity maxPossibleVoltage = 60;
+	handleValueChange(pressedKey, &waveConfig.maxVoltage, 0, maxPossibleVoltage, 1);
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString("Select Intensity", &Font_7x10, White);
+	ssd1306_DrawCircle(64, 32, 22, White);
+	ssd1306_SetCursor(53,23);
+	sprintf(lcdStringBuffer, "%2u", (uint8_t)waveConfig.maxVoltage);
+	ssd1306_WriteString(lcdStringBuffer, &Font_11x18, White);
+	ssd1306_DrawRectangle(0, 58, (waveConfig.maxVoltage / maxPossibleVoltage) * SSD1306_WIDTH, 63, White);
+}
+
+void showIntervalSelectionScreen(KeyType pressedKey) {
+	static const Hz maxPossibleFreq = 5;
+	static const Hz minPossibleFreq = 0.1;
+	handleValueChange(pressedKey, &waveConfig.frequency, minPossibleFreq, maxPossibleFreq, 0.1);
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString("Select Interval", &Font_7x10, White);
+	ssd1306_SetCursor(47,23);
+	sprintf(lcdStringBuffer, "%1.1f", waveConfig.frequency);
+	ssd1306_WriteString(lcdStringBuffer, &Font_11x18, White);
+}
+
+void showDutyCycleSelectionScreen(KeyType pressedKey) {
+	static const DutyCycle maxPossibleDutyCycle = 1;
+	handleValueChange(pressedKey, &waveConfig.dutyCycle_percent, 0, maxPossibleDutyCycle, 0.01);
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString("Select Intensity", &Font_7x10, White);
+	ssd1306_DrawCircle(64, 32, 22, White);
+	ssd1306_SetCursor(53,23);
+	sprintf(lcdStringBuffer, "%2u", (uint8_t)(waveConfig.dutyCycle_percent * 100));
+	ssd1306_WriteString(lcdStringBuffer, &Font_11x18, White);
+	ssd1306_DrawRectangle(0, 58, (waveConfig.dutyCycle_percent / maxPossibleDutyCycle) * SSD1306_WIDTH, 63, White);
 }
 
 void showHomeScreen(void) {
@@ -138,10 +184,13 @@ void handleMenu(void) {
 				showStartTherapy();
     		break;
     	case intensitySelection:
+				showIntensitySelectionScreen(pressedKey);
     		break;
     	case intervalSelection:
+				showIntervalSelectionScreen(pressedKey);
     		break;
     	case dutyCycleSelection:
+				showDutyCycleSelectionScreen(pressedKey);
     		break;
     	case homeScreen:
 				showHomeScreen();
@@ -158,10 +207,4 @@ void handleMenu(void) {
 			watchOverHighVoltage();
 		}
 	}
-	///TODO: Delete later
-		float hv = getHighVoltage();
-		sprintf(lcdStringBuffer, "%-2.2f", hv);
-		ssd1306_SetCursor(70, 0);
-		ssd1306_WriteString(lcdStringBuffer, &Font_7x10, White);
-	  ssd1306_UpdateScreen();
 }
