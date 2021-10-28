@@ -3,8 +3,6 @@
 
 #include "stdint.h"
 
-extern uint16_t adcValues[7];
-
 void initADC(void);
 void startADC(void);
 

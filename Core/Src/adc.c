@@ -78,7 +78,7 @@ void MX_ADC_Init(void)
   }
   /** Configure for the selected ADC regular channel to be converted.
   */
-  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Channel = ADC_CHANNEL_2;
   if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -134,7 +134,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     /**ADC GPIO Configuration
     PA0     ------> ADC_IN0
     PA1     ------> ADC_IN1
-    PA3     ------> ADC_IN3
+    PA2     ------> ADC_IN2
     PA7     ------> ADC_IN7
     PB1     ------> ADC_IN9
     */
@@ -185,7 +185,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
     /**ADC GPIO Configuration
     PA0     ------> ADC_IN0
     PA1     ------> ADC_IN1
-    PA3     ------> ADC_IN3
+    PA2     ------> ADC_IN2
     PA7     ------> ADC_IN7
     PB1     ------> ADC_IN9
     */

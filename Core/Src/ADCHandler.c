@@ -2,7 +2,7 @@
 #include "dma.h"
 #include "adc.h"
 
-uint16_t adcValues[7] = {0, 0, 0, 0, 0, 0, 0};
+static uint16_t adcValues[7] = {0, 0, 0, 0, 0, 0, 0};
 static const float OUTPUT_RESITOR_VALUE = 100.00;
 
 void initADC() {
@@ -15,9 +15,10 @@ void startADC() {
 }
 
 float getVref() {
-	static const uint32_t* VREFINT_CAL_ADDR = (uint32_t*)0x1FFFF7BA;
-	const uint16_t VREFINT_CAL  = *((uint16_t*) VREFINT_CAL_ADDR);
-	return 3.3 * VREFINT_CAL / adcValues[6];
+//	static const uint32_t* VREFINT_CAL_ADDR = (uint32_t*)0x1FFFF7BA;
+//	const uint16_t VREFINT_CAL  = *((uint16_t*) VREFINT_CAL_ADDR);
+//	return 3.3 * VREFINT_CAL / adcValues[6];
+	return 3.3;
 }
 
 float convertToVoltage(uint16_t adcValue) {

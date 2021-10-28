@@ -19,17 +19,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "i2c.h"
-#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
-#include "ssd1306.h"
-#include "ssd1306_tests.h"
-
 #include "ADCHandler.h"
+#include "ButtonReader.h"
+#include "MenuHandler.h"
+#include "WaveGenerator.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -70,7 +67,6 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	char lcdStringBuffer[50];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -91,43 +87,21 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-	
-  initADC();
-  MX_I2C1_Init();
-  MX_TIM1_Init();
-  MX_TIM14_Init();
-  MX_TIM16_Init();
-  MX_TIM17_Init();
-  
-  MX_TIM3_Init();
+	initADC();
+	initDisplay();
+	initPWM();
   /* USER CODE BEGIN 2 */
+	turnOff();
 	startADC();
-	
-	ssd1306_Init();
-	ssd1306_Fill(Black);
-	ssd1306_SetCursor(32, 1);
-  ssd1306_WriteString("Ali", &Font_16x26, White);
-	ssd1306_UpdateScreen();
-	ssd1306_Fill(Black);
-	ssd1306_UpdateScreen();
-	HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
+	showWelcomePage();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		float hv = getHighVoltage();
-		if (hv > 40) {
-			__HAL_TIM_SetCompare(&htim14, TIM_CHANNEL_1, 0);
-		}
-		else {
-			__HAL_TIM_SetCompare(&htim14, TIM_CHANNEL_1, 1000);
-		}
-		sprintf(lcdStringBuffer, "%f", hv);
-		ssd1306_SetCursor(0, 0);
-		ssd1306_WriteString(lcdStringBuffer, &Font_7x10, White);
-		ssd1306_UpdateScreen();
+		handleMenu();
+		watchOverHighVoltage();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -184,7 +158,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) 
+{
+	setPressedKey(GPIO_Pin);
+}
 /* USER CODE END 4 */
 
 /**
