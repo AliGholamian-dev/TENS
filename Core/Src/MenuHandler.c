@@ -25,7 +25,7 @@ static char menuTitles[maxIndex + 1][50] =
 static char lcdStringBuffer[50];
 static MenuState highlightedIndex = startTherapy;
 static MenuState menuState = homeScreen;
-static WaveConfig waveConfig = {0.5, 0.5, 10};
+static WaveConfig waveConfig = {0.5, 0.5, 25};
 
 bool firstTimeEnter = true;
 
@@ -101,7 +101,7 @@ void showStartTherapy(void) {
 
 void showIntensitySelectionScreen(KeyType pressedKey) {
 	static const Intensity maxPossibleVoltage = 60;
-	handleValueChange(pressedKey, &waveConfig.maxVoltage, 0, maxPossibleVoltage, 1);
+	handleValueChange(pressedKey, &waveConfig.maxVoltage, 20, maxPossibleVoltage, 1);
 	ssd1306_SetCursor(0, 0);
 	ssd1306_WriteString("Select Intensity", &Font_7x10, White);
 	ssd1306_DrawCircle(64, 32, 22, White);
@@ -126,7 +126,7 @@ void showDutyCycleSelectionScreen(KeyType pressedKey) {
 	static const DutyCycle maxPossibleDutyCycle = 1;
 	handleValueChange(pressedKey, &waveConfig.dutyCycle_percent, 0, maxPossibleDutyCycle, 0.01);
 	ssd1306_SetCursor(0, 0);
-	ssd1306_WriteString("Select Intensity", &Font_7x10, White);
+	ssd1306_WriteString("Select DutyCycle", &Font_7x10, White);
 	ssd1306_DrawCircle(64, 32, 22, White);
 	ssd1306_SetCursor(53,23);
 	sprintf(lcdStringBuffer, "%2u", (uint8_t)(waveConfig.dutyCycle_percent * 100));
@@ -156,7 +156,7 @@ void showHomeScreen(void) {
 void initDisplay(void) {
 	MX_I2C1_Init();
 	ssd1306_Init();
-	waveConfig.maxVoltage 			 = 10.0;
+	waveConfig.maxVoltage 			 = 25.0;
 	waveConfig.frequency         = 0.50;
 	waveConfig.dutyCycle_percent = 0.50;
 }
