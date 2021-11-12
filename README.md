@@ -1,5 +1,5 @@
 
-TENS (transcutaneous electrical nerve stimulation)
+<h1>TENS (transcutaneous electrical nerve stimulation)</h1>
 
 Transcutaneous electrical nerve stimulation (TENS) is a method of pain relief involving the use of a mild electrical current.
 
@@ -14,11 +14,11 @@ What TENS is used for
 
 TENS may be able to help reduce pain and muscle spasms caused by a wide range of conditions including:
 
-    arthritis
-    period pain
-    pelvic pain caused by endometriosis
-    knee pain
-    neck pain
-    sports injuries
+    1 - arthritis
+    2 - period pain
+    3 - pelvic pain caused by endometriosis
+    4 - knee pain
+    5 - neck pain
+    6 - sports injuries
 
 It's also sometimes used as a method of pain relief during labour.
